@@ -1,10 +1,16 @@
 package ru.netology.lache;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
-
+import java.util.List;
+import java.util.Optional;
 
 
 public class Request {
@@ -15,12 +21,24 @@ public class Request {
     String body;
     Path filePath;
     String mimeType;
-    public Request(Methods method, String path, String body) throws IOException {
+    List<NameValuePair> params;
+
+    public Request(Methods method, String path, String body, List<NameValuePair> params) throws IOException {
         this.method = method;
         this.path = path;
         this.body = body;
         this.filePath = Path.of(".", dir, path);
         this.mimeType = Files.probeContentType(filePath);
+        this.params = params;
+    }
+
+    public Request(Methods method, String path, String body, Path filePath, String mimeType, List<NameValuePair> params) {
+        this.method = method;
+        this.path = path;
+        this.body = body;
+        this.filePath = filePath;
+        this.mimeType = mimeType;
+        this.params = params;
     }
 
     public static HashMap<Request, StatusCode> checkAndCreated(String requestLine) throws IOException {
@@ -48,14 +66,28 @@ public class Request {
             return result;
         }
 
-        final String path = parts[1];
-        if (!Handlers.validPaths(path)) {
+        final String[] pathAndParams = parts[1].split("\\?");
+        final String path = pathAndParams[0];
+        if (!Handlers.validPaths(path) || !path.startsWith("/")) {
             log.log("ERROR ", "Неправильный путь '" + path + "' в запросе: " + requestLine);
             result.put(null, StatusCode.S404);
             return result;
         }
-        result.put(new Request(Methods.valueOf(parts[0]), parts[1], parts[2]), StatusCode.S200);
+
+        List<NameValuePair> paramsR = new ArrayList<>();
+        if (pathAndParams.length > 1) {
+            paramsR = URLEncodedUtils.parse(pathAndParams[1], StandardCharsets.UTF_8);
+        }
+
+        result.put(new Request(Methods.valueOf(parts[0]), path, parts[2], paramsR), StatusCode.S200);
 
         return result;
+    }
+
+    public Optional<NameValuePair> getQueryParam(String name) {
+        return this.params.stream().filter(x -> x.getName().equals(name)).findFirst();
+    }
+    public List<NameValuePair> getQueryParams() {
+        return this.params;
     }
 }

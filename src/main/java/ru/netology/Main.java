@@ -18,7 +18,6 @@ public class Main {
     int port = 9999;
     Server server = new Server();
 
-
     // добавление хендлеров (обработчиков)
     server.addHandler("GET", "/messages", new HandlerFunction() {
       @Override

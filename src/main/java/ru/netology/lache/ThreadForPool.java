@@ -11,6 +11,7 @@ public class ThreadForPool extends Thread {
 
     private static ServerSocket serverSocketThread;
 
+    private static Log log = Log.getInstance();
     public ThreadForPool(ServerSocket serverSocket) {
         serverSocketThread = serverSocket;
         start();
@@ -39,10 +40,20 @@ public class ThreadForPool extends Thread {
                     continue;
                 }
 
+                if (request.params.size()>0) {  // ДЗ Query
+                    log.log("INFO Все параметры: ", request.getQueryParams().toString());
+                    log.log("INFO Параметр last: ", request.getQueryParam("last").toString());
+                }
+
                 Handlers.handlers.get(request.path).get(request.method).handle(request, out);
 
             } catch (IOException e) {
                 e.printStackTrace();
+                try {
+                    log.log("IOException ", String.valueOf(e));
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         }
     }
