@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Request {
@@ -132,8 +133,11 @@ public class Request {
                 log.log("INFO ", "Тело запроса: " + body);
                 paramsR.addAll(URLEncodedUtils.parse(body, StandardCharsets.UTF_8));
 
-                /*final Optional<String> contentType = extractHeader(headers, "Content-Type");
-                //final String charsetName = "------WebKitFormBoundaryD5kRmGTp9gyXGA0T";
+                final Optional<String> contentType = extractHeader(headers, "Content-Type");
+                System.out.println("contentType: " + contentType);
+                final Optional<String> boundary = extractHeader(headers, "boundary");
+                System.out.println("boundary: " + boundary);
+                /*//final String charsetName = "------WebKitFormBoundaryD5kRmGTp9gyXGA0T";
                  if (contentType.toString().contains("multipart/form-data")) {
                    // paramsR = URLEncodedUtils.parse(body, StandardCharsets.UTF_8, Charset.forName(charsetName);
                 }
@@ -179,6 +183,31 @@ public class Request {
     }
     public List<NameValuePair> getQueryParams() {
         return this.params;
+    }
+
+    public Map<String, List<String>> getPostParam(String name) {
+        Map<String, List<String>> result = new HashMap<>();
+        for (NameValuePair item : this.params) {
+            if (item.getName().equals(name)) {
+                if (!result.containsKey(item.getName())) {
+                    result.put(item.getName(), new ArrayList<>());
+                }
+                result.get(item.getName()).add(item.getValue());
+            }
+        }
+        System.out.println("result из getPostParams(): " + result);
+        return result;
+    }
+    public Map<String, List<String>> getPostParams() {
+        Map<String, List<String>> result = new HashMap<>();
+        for (NameValuePair item : this.params) {
+            if (!result.containsKey(item.getName())) {
+                result.put(item.getName(), new ArrayList<>());
+            }
+            result.get(item.getName()).add(item.getValue());
+        }
+        System.out.println("result из getPostParams(): " + result);
+        return result;
     }
 
 }
