@@ -44,11 +44,20 @@ public class Handlers {
         addHandler("/forms.html", Methods.GET, (Request r, BufferedOutputStream bo) -> {
             ThreadForPool.sendRespond(bo, StatusCode.S200.getCommand(), r.mimeType, Files.size(r.filePath), null, r.filePath);
         });
+        addHandler("/forms.html", Methods.POST, (Request r, BufferedOutputStream bo) -> {
+            ThreadForPool.sendRespond(bo, StatusCode.S200.getCommand(), r.mimeType, Files.size(r.filePath), null, r.filePath);
+        });
         addHandler("/events.html", Methods.GET, (Request r, BufferedOutputStream bo) -> {
             ThreadForPool.sendRespond(bo, StatusCode.S200.getCommand(), r.mimeType, Files.size(r.filePath), null, r.filePath);
         });
         addHandler("/events.js",    Methods.GET, (Request r, BufferedOutputStream bo) -> {
             ThreadForPool.sendRespond(bo, StatusCode.S200.getCommand(), r.mimeType, Files.size(r.filePath), null, r.filePath);
+        });
+        addHandler("/default-get.html",    Methods.GET, (Request r, BufferedOutputStream bo) -> {
+            ThreadForPool.sendRespond(bo, StatusCode.S200.getCommand(), r.mimeType, 0, null, null);
+        });
+        addHandler("/test",    Methods.POST, (Request r, BufferedOutputStream bo) -> {
+            ThreadForPool.sendRespond(bo, StatusCode.S200.getCommand(), r.mimeType, 0, null, null);
         });
         return true;
     }

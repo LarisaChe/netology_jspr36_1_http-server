@@ -23,28 +23,33 @@ public class ThreadForPool extends Thread {
         while (true) {
 
             try (Socket socket = serverSocketThread.accept();
-                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                 BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
                  BufferedOutputStream out = new BufferedOutputStream(socket.getOutputStream());) {
 
-                // read only request line for simplicity
-                // must be in form GET /path HTTP/1.1
-                String requestLine;
+                final int limit = 4096;
+                in.mark(limit);
+
+                Map<Request, StatusCode> requestStringMap = Request.readInCheckAndCreatedRequest(in, limit);
+                /* String requestLine;
                 requestLine = in.readLine();
 
                 if (requestLine == null) continue;
 
-                Map<Request, StatusCode> requestStringMap = Request.checkAndCreated(requestLine);
+                Map<Request, StatusCode> requestStringMap = Request.checkAndCreated(requestLine);*/
                 Request request = requestStringMap.entrySet().iterator().next().getKey();
                 if (request == null) {
                     sendBadRespond(out, requestStringMap.get(request).getCommand());
                     continue;
                 }
 
-                if (request.params.size()>0) {  // ДЗ Query
-                    log.log("INFO Все параметры: ", request.getQueryParams().toString());
-                    log.log("INFO Параметр last: ", request.getQueryParam("last").toString());
+                synchronized (request) {
+                    System.out.println(request);
+                    if (request.params.size() > 0) {  // ДЗ Query
+                        log.log("INFO Все параметры: ", request.getQueryParams().toString());
+                        log.log("INFO Параметр last: ", request.getQueryParam("last").toString());
+                    }
                 }
-
                 Handlers.handlers.get(request.path).get(request.method).handle(request, out);
 
             } catch (IOException e) {
