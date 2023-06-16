@@ -11,7 +11,7 @@ public enum StatusCode {
         this.msg = msg;
     }
 
-    public String getCommand() {
+    public String getMessage() {
         return msg;
     }
 }
