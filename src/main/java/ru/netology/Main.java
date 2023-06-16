@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.logging.Handler;
 
 public class Main {
-  public static void main(String[] args) {
+  public static void main(String[] args) throws IOException {
     int port = 9999;
     Server server = new Server();
 
@@ -31,7 +31,7 @@ public class Main {
       }
     });
 
-    System.out.println(Handlers.handlers);
+    System.out.println(Handlers.getHandlers());
 
     server.start(port);
   }

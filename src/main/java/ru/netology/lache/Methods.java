@@ -6,7 +6,7 @@ public enum Methods {
     PUT,
     DELETE;
 
-    public static boolean check(String method) {
+    public static boolean isMethodExisted(String method) {
         switch (Methods.valueOf(method)) {
             case GET:
                 //return true;
