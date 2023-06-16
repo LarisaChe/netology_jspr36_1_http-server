@@ -193,5 +193,28 @@ public class Request {
     public List<NameValuePair> getQueryParams() {
         return this.params;
     }
-
+    public Map<String, List<String>> getPostParam(String name) {
+        Map<String, List<String>> result = new HashMap<>();
+        for (NameValuePair item : this.params) {
+            if (item.getName().equals(name)) {
+                if (!result.containsKey(item.getName())) {
+                    result.put(item.getName(), new ArrayList<>());
+                }
+                result.get(item.getName()).add(item.getValue());
+            }
+        }
+        // System.out.println("result из getPostParam(" + name + "): " + result);
+        return result;
+    }
+    public Map<String, List<String>> getPostParams() {
+        Map<String, List<String>> result = new HashMap<>();
+        for (NameValuePair item : this.params) {
+            if (!result.containsKey(item.getName())) {
+                result.put(item.getName(), new ArrayList<>());
+            }
+            result.get(item.getName()).add(item.getValue());
+        }
+        // System.out.println("result из getPostParams(): " + result);
+        return result;
+    }
 }

@@ -33,6 +33,10 @@ public class ThreadForPool extends Thread {
                     log.log("INFO Параметр last: ", request.getQueryParam("last").toString());
                 }
 
+                if (request.getParams().size() > 0) {  // ДЗ x-www-form-urlencoded* (задача со звёздочкой)
+                    log.log("INFO Все параметры: ", request.getPostParams().toString());
+                    log.log("INFO Параметр value: ", request.getPostParam("value").toString());
+                }
                 Handlers.getHandlers().get(request.getPath()).get(request.getMethod()).handle(request, out);
             }
         } catch (IOException e) {
