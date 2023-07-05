@@ -1,7 +1,10 @@
 package ru.netology.lache;
 
+import org.apache.commons.fileupload.FileUploadException;
+
 import java.io.*;
 import java.net.Socket;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -28,19 +31,25 @@ public class ThreadForPool extends Thread {
             if (request.getStatusCode().equals(StatusCode.S400) || request.getStatusCode().equals(StatusCode.S404)) {
                 sendBadRespond(out, request.getStatusCode().getMessage());
             } else {
-                if (request.getParams().size() > 0) {  // ДЗ Query
-                    log.log("INFO Все параметры: ", request.getQueryParams().toString());
-                    log.log("INFO Параметр last: ", request.getQueryParam("last").toString());
+                if (request.getQueryParams().size() > 0) {  // ДЗ Query
+                    log.log("INFO Все Query-параметры: ", request.getQueryParams().toString());
+                    log.log("INFO Query-Параметр last: ", request.getQueryParam("last").toString());
                 }
 
-                if (request.getParams().size() > 0) {  // ДЗ x-www-form-urlencoded* (задача со звёздочкой)
-                    log.log("INFO Все параметры: ", request.getPostParams().toString());
-                    log.log("INFO Параметр value: ", request.getPostParam("value").toString());
+                if (request.getQueryParams().size() > 0) {  // ДЗ x-www-form-urlencoded* (задача со звёздочкой)
+                    log.log("INFO Все Post-параметры: ", request.getPostParams().toString());
+                    log.log("INFO Post-Параметр value: ", request.getPostParam("value").toString());
                 }
                 Handlers.getHandlers().get(request.getPath()).get(request.getMethod()).handle(request, out);
             }
         } catch (IOException e) {
             //e.printStackTrace();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        } catch (FileUploadException e) {
+            throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
